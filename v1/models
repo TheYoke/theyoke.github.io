@@ -1,0 +1,1 @@
+{"object":"list","data":[{"id":"llama3.1-8b","object":"model","created":1693721698,"owned_by":"Meta","active":true,"context_window":8192,"public_apps":null},{"id":"llama3.1-70b","object":"model","created":1693721698,"owned_by":"Meta","active":true,"context_window":8192,"public_apps":null}]}

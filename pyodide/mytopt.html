@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTOPT</title>
+    <head>
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+    </head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        input[type="password"], button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            font-size: 18px;
+        }
+        input[type="password"] {
+            background-color: #333;
+            color: #fff;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            background-color: #45a049;
+            cursor: not-allowed;
+        }
+        #outputArea {
+            display: none;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="inputArea">
+            <input type="password" id="passwordInput" placeholder="Enter password">
+            <br>
+            <button id="submitButton" onclick="runPythonCode()">Decrypt</button>
+        </div>
+        <div id="outputArea"></div>
+    </div>
+
+    <script>
+        const submitButton = document.getElementById('submitButton');
+        const passwordInput = document.getElementById('passwordInput');
+        const inputArea = document.getElementById('inputArea');
+        const outputArea = document.getElementById('outputArea');
+
+        async function runPythonCode() {
+            passwordInput.disabled = true;
+            submitButton.disabled = true;
+            submitButton.textContent = 'Decrypting ...';
+
+            let pyodide = await loadPyodide();
+            await pyodide.loadPackage("micropip");
+            const micropip = pyodide.pyimport("micropip");
+            await micropip.install("cryptography");
+            try {
+                let output = pyodide.runPython(await (await fetch("mytopt.py")).text());
+                outputArea.innerHTML = output
+            } catch (err) {
+                outputArea.style.color = 'red'
+                outputArea.textContent = err
+            }
+
+            inputArea.style.transition = 'opacity 0.2s';
+            inputArea.style.opacity = '0';
+
+            setTimeout(() => {
+                inputArea.style.display = 'none';
+                outputArea.style.display = 'block';
+                outputArea.style.opacity = '0';
+                outputArea.style.transition = 'opacity 0.2s';
+
+                setTimeout(() => {
+                    outputArea.style.opacity = '1';
+                }, 100);
+            }, 100);
+        }
+
+        passwordInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitButton.click();
+            }
+        });
+    </script>
+</body>
+</html>

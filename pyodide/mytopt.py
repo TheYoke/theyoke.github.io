@@ -15,20 +15,21 @@ import time
 
 
 DATA = """
-#G_^D42U8)N>2nEbXH-v)PV&<R*O|f8z85%2;cIzpvz8kB(aL3km09D@PzH9vRF`G9syz1qW@xsG1CjY
-55d0H3w@lDoiVBJ!0i*K>5SJ9H*c<+fK|yI2=p*XEywXLiq#zG|2^;XUPl)b0#5IvBLOi7V4>oh1N5(`
-tXsA=;y!P=T6D_il!qUT^j+WT*`Y}9sDzhlfj-Ix18}3=K~v%ktT!5n;75gbb068zE9MU6e8ju&7Q8>0
-5n;_)()Ivug^jSlvL;1Q_MCu&nT!*yt}&0=gc;RASB$j7gAW0WhQw*%2*+~9Fn#Ag(fPi_-cqq`O-%Fz
-gHHI7?>89y+}MF}+A3<LuLf8b!c^z=|3DqVPo~%uE+6DOJ!d%$lsOm)Rk0vJ4yK_VV@e_tHkHT^)~{k^
-h-oZ}{UZx0o|7AFcXKnfE6^j`bybu(v4_K=+%EjQ0Aj-8WI;bf^h#Q$%_IS~4xC1KC?}#6pdYXkGPeG1
-0!E_w3qdFD>5>ipwbxqJsbxty(_?F!`_8o~pYl2j2o`s0{9C7nzcs7>UwuJYY2)FKs*@8a3Ov6R#Ea+|
-C~_2EiH9u|HpBmTQqR1Y|6@s4*VcDO><UmV=@rsc*pYA6UwLGMy-UV}coDj{A$=SunjLnj_p>BVEj<oL
-mJ`jkU+LXj%PcM$GWm|#&z#{qs=(GwFqWmxgwBHpmT@%x^kmQ;a1Zor4oBYurM=uTYkZL`AWG<GQ&%19
-w&mQ01l})!=pFA^m_>MJkQu%N@YSt1)ww@!>pzreOVD<5`HH6C)?=oFC}^*jFCNvDc5i6pE&ixc8}+1&
-eL*F<n)f=}GsNz(MV`2yz+m}{m68jdDidlksqri9gKGZ$s5lDj4prI
+s_|QbNxP$ZfN)Cz5=)ju=swC0tmcTAp=b6-qKh#?JfkJNtn^e`esy$-tYsrriubq|ucCZ<yA32R?u?s(
+bM$8(c$}t?hLbQcG+P!jb;$pqHYb4#+kGo}W);=r4pQgN(ZptXhtT@6!w_Ea$l{5fZ|`{Yra4HBjI|K(
+wS$9yEkJp$&gl|@3|l;#LIkyhNk~K^ME$TfVY*{k(_zKTwCG$}@zVE^rQpNmdHuEdlfS(s4slopT`frn
+QWeNBE-OWkn&e8b9x7&k<KK;25bI|YUOjL3^TA5rL15<fnKp!#*wC(ys^s#Ir37~$V~SBOPwK|`iK8vv
+CeSJqMry37-~s;L<i%{I3<VqVswQ6xxm#Af;_kEjXFNuwu<zcxX1tUdfWd~&dx?{WN|#B)h*pwgIlY-F
+wNA5clI*za=)_$gw`@KUA}-<{0y|W8B4u2k5ze^pGR^YjOHZqH*JgLIj4*S>K3!liQt>56>BHnzzEzU!
+bvUSTA587Bovl6*dk=yIZZpXdA~uw1mOFk9bkpx4wJfLp=zS~;fjWE_{zAIJltzk==2Wk^(fTl?curJ6
+sCydgU?vjsR<K?J6otgPIXX9}x1P4LkL))>#s7Y8`mH4G%dIWNjPhEgRi>j@whJuf2k_!U`AHO})c4do
+YybBspiaFH=Iy5VmG)iWm@yQeo0;WVBCSU1$oTPHidP9BliZlI5(*B#e=PUJPFpdzZxl|yV8cUvy^f3%
+rREF6yU)_YZ40gF&4@KE9lH9!T+~&2sgrAR(VI(ZYDc2&O^Pm;#UW~9niAKUl{1hcc?7JntFUe>+$iP)
+J821=mc+P+h~Yh~j3)MtJZh2O@xYC~w*xF5<;jw*M86and!T8|i7bGJ4YyB~w_QTMf{rOx!|xY|_LtL5
+A|Pu?VqSNL3-nU$c4JdgYX$$Uc6vHt?WSOX);8YCeA=*&X~;VN<1dXg72N
 """
 
-NONCE = b'4!\xceq8\x06\xf4\xd0\xc2\xa0\x02\x82'
+NONCE = b'\x9d\x85\xc7\xfd?\x87?+\xd6p\xd6\xbe'
 
 
 def main():

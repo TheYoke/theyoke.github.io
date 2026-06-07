@@ -1,14 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>Welcome</title>
-    </head>
-	<body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inspirational Quote Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Poppins:wght@300;400;500;600&display=swap');
 
-	    <h1>
-        There are no questions that cannot be answered.
-      </h1>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Default background, will be overridden by JS */
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            transition: background 1s ease-in-out;
+        }
 
-	</body>
+        .quote-text {
+            font-family: 'Merriweather', serif;
+        }
+
+        /* Animation for quote fading */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+        
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* Glassmorphism effect for the card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 antialiased text-gray-800">
+
+    <div class="glass-card rounded-3xl shadow-2xl max-w-2xl w-full p-8 md:p-12 relative overflow-hidden transition-all duration-300">
+        
+        <!-- Background decorative icon -->
+        <i class="fa-solid fa-quote-left absolute top-[-20px] left-[-10px] text-9xl text-gray-200 opacity-30 -z-10 pointer-events-none"></i>
+
+        <div id="quote-container" class="fade-in relative z-10 min-h-[150px] flex flex-col justify-center">
+            
+            <div class="mb-6 relative">
+                <i class="fa-solid fa-quote-left text-3xl text-[var(--theme-color)] mb-4 inline-block transition-colors duration-500" id="quote-icon"></i>
+                <h2 id="quote-text" class="quote-text text-2xl md:text-3xl lg:text-4xl leading-relaxed text-gray-800 font-medium italic transition-opacity duration-500">
+                    Loading an inspiring thought...
+                </h2>
+            </div>
+            
+            <div class="flex items-center justify-end mt-4">
+                <div class="w-12 h-px bg-[var(--theme-color)] mr-4 transition-colors duration-500" id="author-line"></div>
+                <p id="author" class="text-lg md:text-xl font-semibold text-gray-600 transition-opacity duration-500">
+                    Please wait
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 pt-6">
+            
+            <div class="flex gap-3 w-full sm:w-auto justify-center">
+                <button id="tweet-quote" class="group relative flex items-center justify-center w-12 h-12 rounded-full border-2 border-gray-300 text-gray-500 hover:border-[#1DA1F2] hover:text-[#1DA1F2] hover:bg-[#1DA1F2]/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1DA1F2]" title="Tweet this quote">
+                    <i class="fa-brands fa-twitter text-xl transition-transform group-hover:scale-110"></i>
+                </button>
+                <button id="copy-quote" class="group relative flex items-center justify-center w-12 h-12 rounded-full border-2 border-gray-300 text-gray-500 hover:border-gray-800 hover:text-gray-800 hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800" title="Copy to clipboard">
+                    <i class="fa-regular fa-copy text-xl transition-transform group-hover:scale-110"></i>
+                    <!-- Copied tooltip -->
+                    <span id="copy-tooltip" class="absolute -top-10 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                        Copied!
+                    </span>
+                </button>
+            </div>
+
+            <button id="new-quote" class="w-full sm:w-auto px-8 py-3 rounded-full text-white font-medium text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2" style="background-color: var(--theme-color);">
+                <span>New Quote</span>
+                <i class="fa-solid fa-arrow-right ml-2 animate-pulse"></i>
+            </button>
+            
+        </div>
+    </div>
+
+    <script>
+        // Array of high-quality, curated quotes
+        const quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
+            { text: "Your time is limited, so don't waste it living someone else's life.", author: "Steve Jobs" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+            { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela" },
+            { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
+            { text: "If life were predictable it would cease to be life, and be without flavor.", author: "Eleanor Roosevelt" },
+            { text: "If you look at what you have in life, you'll always have more. If you look at what you don't have in life, you'll never have enough.", author: "Oprah Winfrey" },
+            { text: "If you set your goals ridiculously high and it's a failure, you will fail above everyone else's success.", author: "James Cameron" },
+            { text: "Spread love everywhere you go. Let no one ever come to you without leaving happier.", author: "Mother Teresa" },
+            { text: "When you reach the end of your rope, tie a knot in it and hang on.", author: "Franklin D. Roosevelt" },
+            { text: "Always remember that you are absolutely unique. Just like everyone else.", author: "Margaret Mead" },
+            { text: "Don't judge each day by the harvest you reap but by the seeds that you plant.", author: "Robert Louis Stevenson" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", author: "Benjamin Franklin" },
+            { text: "The best and most beautiful things in the world cannot be seen or even touched - they must be felt with the heart.", author: "Helen Keller" },
+            { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+            { text: "Whoever is happy will make others happy too.", author: "Anne Frank" },
+            { text: "Do not go where the path may lead, go instead where there is no path and leave a trail.", author: "Ralph Waldo Emerson" },
+            { text: "You will face many defeats in life, but never let yourself be defeated.", author: "Maya Angelou" },
+            { text: "In the end, it's not the years in your life that count. It's the life in your years.", author: "Abraham Lincoln" },
+            { text: "Never let the fear of striking out keep you from playing the game.", author: "Babe Ruth" },
+            { text: "Life is either a daring adventure or nothing at all.", author: "Helen Keller" },
+            { text: "Many of life's failures are people who did not realize how close they were to success when they gave up.", author: "Thomas A. Edison" },
+            { text: "You have brains in your head. You have feet in your shoes. You can steer yourself any direction you choose.", author: "Dr. Seuss" },
+            { text: "I alone cannot change the world, but I can cast a stone across the water to create many ripples.", author: "Mother Teresa" },
+            { text: "Nothing is impossible, the word itself says, 'I'm possible!'", author: "Audrey Hepburn" },
+            { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford" },
+            { text: "Perfection is not attainable, but if we chase perfection we can catch excellence.", author: "Vince Lombardi" }
+        ];
+
+        // Array of gradient pairs for dynamic backgrounds
+        const colors = [
+            { bg1: '#ff9a9e', bg2: '#fecfef', theme: '#ff758c' }, // Rose/Pink
+            { bg1: '#a18cd1', bg2: '#fbc2eb', theme: '#8971d0' }, // Purple/Pink
+            { bg1: '#84fab0', bg2: '#8fd3f4', theme: '#4cd187' }, // Green/Blue
+            { bg1: '#fccb90', bg2: '#d57eeb', theme: '#e69074' }, // Orange/Purple
+            { bg1: '#e0c3fc', bg2: '#8ec5fc', theme: '#a29bfe' }, // Light Purple/Blue
+            { bg1: '#4facfe', bg2: '#00f2fe', theme: '#0984e3' }, // Blue
+            { bg1: '#43e97b', bg2: '#38f9d7', theme: '#00b894' }, // Mint
+            { bg1: '#fa709a', bg2: '#fee140', theme: '#ff7675' }, // Pink/Yellow
+            { bg1: '#a8edea', bg2: '#fed6e3', theme: '#74b9ff' }, // Light Teal/Pink
+            { bg1: '#fdfbfb', bg2: '#ebedee', theme: '#636e72' }  // Grey/White (Neutral fallback)
+        ];
+
+        // DOM Elements
+        const quoteTextEl = document.getElementById('quote-text');
+        const authorEl = document.getElementById('author');
+        const newQuoteBtn = document.getElementById('new-quote');
+        const tweetBtn = document.getElementById('tweet-quote');
+        const copyBtn = document.getElementById('copy-quote');
+        const quoteContainer = document.getElementById('quote-container');
+        const copyTooltip = document.getElementById('copy-tooltip');
+        
+        let currentQuote = {};
+
+        // Function to get a random item from an array
+        function getRandomItem(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        // Function to update the UI with a new quote and colors
+        function getNewQuote() {
+            // Disable button during transition to prevent spam clicking
+            newQuoteBtn.disabled = true;
+            
+            // Add fade-out animation
+            quoteTextEl.classList.add('opacity-0');
+            authorEl.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                // Get new random quote
+                let newQuote;
+                do {
+                    newQuote = getRandomItem(quotes);
+                } while (newQuote.text === currentQuote.text && quotes.length > 1); // Ensure we don't get the same quote twice in a row
+                
+                currentQuote = newQuote;
+                
+                // Get new random color theme
+                const colorTheme = getRandomItem(colors);
+                
+                // Update text content
+                quoteTextEl.textContent = `"${currentQuote.text}"`;
+                authorEl.textContent = `- ${currentQuote.author}`;
+                
+                // Update theme colors via CSS Variables on the document root
+                document.documentElement.style.setProperty('--theme-color', colorTheme.theme);
+                
+                // Update background gradient
+                document.body.style.background = `linear-gradient(135deg, ${colorTheme.bg1} 0%, ${colorTheme.bg2} 100%)`;
+                
+                // Update button color explicitly (fallback for custom property if needed)
+                newQuoteBtn.style.backgroundColor = colorTheme.theme;
+                newQuoteBtn.style.boxShadow = `0 10px 15px -3px ${colorTheme.theme}60, 0 4px 6px -4px ${colorTheme.theme}60`;
+
+                // Fade back in
+                quoteTextEl.classList.remove('opacity-0');
+                authorEl.classList.remove('opacity-0');
+                
+                // Re-enable button
+                newQuoteBtn.disabled = false;
+                
+            }, 400); // Wait for fade out to complete before changing content
+        }
+
+        // Function to tweet the quote
+        function tweetQuote() {
+            if (!currentQuote.text) return;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(`"${currentQuote.text}" - ${currentQuote.author}`)}`;
+            window.open(twitterUrl, '_blank');
+        }
+
+        // Function to copy quote to clipboard
+        function copyToClipboard() {
+            if (!currentQuote.text) return;
+            
+            const textToCopy = `"${currentQuote.text}" - ${currentQuote.author}`;
+            
+            // Try using modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showCopiedTooltip();
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(textToCopy);
+                });
+            } else {
+                // Fallback for older browsers or non-secure contexts (like some iframes)
+                fallbackCopyTextToClipboard(textToCopy);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Avoid scrolling to bottom
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopiedTooltip();
+                } else {
+                    console.error('Fallback: Copying text command was unsuccessful');
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function showCopiedTooltip() {
+            copyTooltip.classList.remove('opacity-0');
+            setTimeout(() => {
+                copyTooltip.classList.add('opacity-0');
+            }, 2000);
+        }
+
+        // Event Listeners
+        newQuoteBtn.addEventListener('click', getNewQuote);
+        tweetBtn.addEventListener('click', tweetQuote);
+        copyBtn.addEventListener('click', copyToClipboard);
+
+        // Initialize with a quote on load
+        document.documentElement.style.setProperty('--theme-color', '#ff758c'); // Initial default theme color
+        getNewQuote();
+
+    </script>
+</body>
 </html>

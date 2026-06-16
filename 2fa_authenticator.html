@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA Authenticator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s linear, stroke 0.3s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        
+        /* Utility to hide elements cleanly */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center font-sans p-4">
+
+    <!-- This is where the encrypted base64 payload is stored. -->
+    <script>
+        const ENCRYPTED_DATA_STORE = "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";
+    </script>
+
+    <div id="app-container" class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden h-[750px] max-h-[90vh] flex flex-col relative">
+        
+        <!-- ================= LOGIN VIEW ================= -->
+        <div id="view-login" class="flex-1 flex flex-col items-center justify-center p-8 z-10">
+            <div class="bg-indigo-500/20 p-4 rounded-full mb-6 text-indigo-400">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h1 class="text-2xl font-bold mb-2">Authenticator</h1>
+            <p class="text-slate-400 text-sm mb-8 text-center">Enter your master password to decrypt your accounts.</p>
+            
+            <form id="login-form" class="w-full space-y-4">
+                <div>
+                    <input type="password" id="master-password" placeholder="Master Password" 
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                        required>
+                </div>
+                <div id="login-error" class="text-red-400 text-sm hidden text-center">Invalid password or corrupted data.</div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg px-4 py-3 transition-colors flex justify-center items-center gap-2">
+                    Unlock Vault
+                </button>
+                <p class="text-xs text-slate-500 text-center mt-4">Use password "demo" for a demo.</p>
+            </form>
+        </div>
+
+        <!-- ================= MAIN APP VIEW ================= -->
+        <div id="view-main" class="flex-1 flex flex-col hidden z-10 min-h-0">
+            <!-- Header -->
+            <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center sticky top-0 z-20">
+                <div class="flex items-center gap-3">
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <svg class="w-8 h-8 absolute" viewBox="0 0 36 36">
+                            <circle class="text-slate-800" stroke-width="3" stroke="currentColor" fill="transparent" r="16" cx="18" cy="18"/>
+                            <circle id="epoch-progress" class="progress-ring__circle text-indigo-500" stroke-width="3" stroke-dasharray="100.53" stroke-dashoffset="0" stroke="currentColor" fill="transparent" r="16" cx="18" cy="18"/>
+                        </svg>
+                        <span id="epoch-time" class="text-xs font-medium relative z-10">30</span>
+                    </div>
+                    <h1 class="font-semibold text-lg tracking-tight">Authenticator</h1>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="btn-toggle-edit" class="p-2 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded-lg transition-colors" title="Toggle Edit Mode">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                    </button>
+                    <button id="btn-show-export" class="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors" title="Export Accounts">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Account List -->
+            <div id="account-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Dynamically populated -->
+            </div>
+
+            <!-- Footer / FAB -->
+            <div class="p-4 bg-slate-900 border-t border-slate-800 mt-auto">
+                <button id="btn-show-add" class="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 text-slate-200 font-medium rounded-xl px-4 py-3 transition-colors flex justify-center items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    Add Account
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= ADD ACCOUNT MODAL ================= -->
+        <div id="modal-add" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-30 flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full p-5">
+                <h2 class="text-xl font-semibold mb-4">Add Account</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Account Name</label>
+                        <input type="text" id="add-name" placeholder="e.g. Google, GitHub" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Secret Key (Base32)</label>
+                        <input type="text" id="add-secret" placeholder="JBSWY3DPEHPK3PXP" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono text-sm uppercase">
+                    </div>
+                    <div id="add-error" class="text-red-400 text-sm hidden"></div>
+                    <div class="flex gap-3 pt-2">
+                        <button id="btn-cancel-add" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">Cancel</button>
+                        <button id="btn-save-add" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= EXPORT MODAL ================= -->
+        <div id="modal-export" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-30 flex flex-col p-4 pt-10">
+            <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full flex-1 flex flex-col p-5 overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold">Export Vault</h2>
+                    <button id="btn-close-export" class="text-slate-400 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                
+                <p class="text-sm text-slate-400 mb-4">
+                    Replace the <code class="bg-slate-800 px-1 rounded">ENCRYPTED_DATA_STORE</code> variable in this HTML file with the string below to save your changes permanently.
+                </p>
+
+                <div class="flex items-center justify-between mb-4 bg-slate-800 p-2 rounded-lg">
+                    <span class="text-sm font-medium">Format</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400" id="lbl-plain">JSON</span>
+                        <button id="toggle-encrypt" class="w-10 h-6 bg-indigo-600 rounded-full relative transition-colors focus:outline-none">
+                            <div id="toggle-thumb" class="w-4 h-4 bg-white rounded-full absolute top-1 right-1 transition-transform"></div>
+                        </button>
+                        <span class="text-xs text-indigo-400 font-medium" id="lbl-encrypt">Encrypted</span>
+                    </div>
+                </div>
+
+                <div id="export-password-group" class="mb-4">
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Encryption Password</label>
+                    <div class="relative">
+                        <input type="password" id="export-password" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 pr-10 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        <button type="button" id="btn-toggle-export-pwd" class="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200">
+                            <svg id="icon-pwd-hide" class="w-5 h-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"/><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
+                            <svg id="icon-pwd-show" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">Changing this encrypts the payload with a new password.</p>
+                </div>
+
+                <div class="flex-1 relative mb-4">
+                    <textarea id="export-text" readonly class="w-full h-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-300 resize-none focus:outline-none focus:border-indigo-500"></textarea>
+                </div>
+
+                <button id="btn-copy-export" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <span>Copy to Clipboard</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= CONFIRM DELETE MODAL ================= -->
+        <div id="modal-confirm" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm hidden z-40 flex items-center justify-center p-4">
+            <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full p-5 max-w-sm text-center">
+                <div class="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">Delete Account?</h3>
+                <p class="text-sm text-slate-400 mb-6">Are you sure you want to remove <strong id="confirm-name" class="text-white"></strong>? This action cannot be undone.</p>
+                <div class="flex gap-3">
+                    <button id="btn-confirm-cancel" class="flex-1 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors text-sm">Cancel</button>
+                    <button id="btn-confirm-delete" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /** * ==========================================
+         * CORE CRYPTOGRAPHY & TOTP ALGORITHMS
+         * ==========================================
+         * Built entirely with window.crypto.subtle
+         */
+
+        // Base32 Decoding
+        function base32ToUint8Array(base32) {
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+            base32 = base32.toUpperCase().replace(/[\s=]/g, '');
+            const bytes = new Uint8Array(Math.floor(base32.length * 5 / 8));
+            let bits = 0, value = 0, index = 0;
+            
+            for (let i = 0; i < base32.length; i++) {
+                const val = alphabet.indexOf(base32[i]);
+                if (val === -1) throw new Error("Invalid base32 character");
+                value = (value << 5) | val;
+                bits += 5;
+                if (bits >= 8) {
+                    bytes[index++] = (value >>> (bits - 8)) & 255;
+                    bits -= 8;
+                }
+            }
+            return bytes;
+        }
+
+        // TOTP Generation (HMAC-SHA1)
+        async function generateTOTP(secretBase32) {
+            const keyBytes = base32ToUint8Array(secretBase32);
+            const epoch = Math.floor(Date.now() / 1000);
+            const counter = Math.floor(epoch / 30);
+
+            const counterBuffer = new ArrayBuffer(8);
+            const dataView = new DataView(counterBuffer);
+            dataView.setUint32(0, 0, false); 
+            dataView.setUint32(4, counter, false); 
+
+            const key = await crypto.subtle.importKey(
+                "raw", keyBytes, { name: "HMAC", hash: "SHA-1" }, false, ["sign"]
+            );
+            const signature = await crypto.subtle.sign("HMAC", key, counterBuffer);
+            const hmac = new Uint8Array(signature);
+
+            const offset = hmac[19] & 0xf;
+            const code = ((hmac[offset] & 0x7f) << 24) |
+                         ((hmac[offset + 1] & 0xff) << 16) |
+                         ((hmac[offset + 2] & 0xff) << 8) |
+                         (hmac[offset + 3] & 0xff);
+
+            return (code % 1000000).toString().padStart(6, '0');
+        }
+
+        // Base64 Utils
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binaryString = window.atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        // Key Derivation (PBKDF2)
+        async function deriveKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+            );
+            return crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+            );
+        }
+
+        // Encrypt (AES-GCM)
+        async function encryptData(text, password) {
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveKey(password, salt);
+            const enc = new TextEncoder();
+            
+            const ciphertext = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv }, key, enc.encode(text)
+            );
+            
+            // Pack: salt(16) + iv(12) + ciphertext
+            const bundle = new Uint8Array(16 + 12 + ciphertext.byteLength);
+            bundle.set(salt, 0);
+            bundle.set(iv, 16);
+            bundle.set(new Uint8Array(ciphertext), 28);
+            
+            return arrayBufferToBase64(bundle.buffer);
+        }
+
+        // Decrypt (AES-GCM)
+        async function decryptData(b64, password) {
+            const bundle = new Uint8Array(base64ToArrayBuffer(b64));
+            if (bundle.byteLength < 28) throw new Error("Invalid payload");
+            
+            const salt = bundle.slice(0, 16);
+            const iv = bundle.slice(16, 28);
+            const ciphertext = bundle.slice(28);
+            
+            const key = await deriveKey(password, salt);
+            const decrypted = await crypto.subtle.decrypt(
+                { name: "AES-GCM", iv: iv }, key, ciphertext
+            );
+            
+            const dec = new TextDecoder();
+            return dec.decode(decrypted);
+        }
+
+
+        /** * ==========================================
+         * APPLICATION STATE & LOGIC
+         * ==========================================
+         */
+        
+        let state = {
+            accounts: [],
+            password: '',
+            revealedIds: new Set(),
+            currentEpochBlock: 0,
+            isExportEncrypted: true,
+            isEditMode: false
+        };
+
+        // DOM Elements
+        const DOM = {
+            login: document.getElementById('view-login'),
+            main: document.getElementById('view-main'),
+            loginForm: document.getElementById('login-form'),
+            pwdInput: document.getElementById('master-password'),
+            loginError: document.getElementById('login-error'),
+            
+            accountList: document.getElementById('account-list'),
+            epochProgress: document.getElementById('epoch-progress'),
+            epochTime: document.getElementById('epoch-time'),
+            btnToggleEdit: document.getElementById('btn-toggle-edit'),
+            
+            modalAdd: document.getElementById('modal-add'),
+            btnAdd: document.getElementById('btn-show-add'),
+            btnSaveAdd: document.getElementById('btn-save-add'),
+            btnCancelAdd: document.getElementById('btn-cancel-add'),
+            addName: document.getElementById('add-name'),
+            addSecret: document.getElementById('add-secret'),
+            addError: document.getElementById('add-error'),
+
+            modalExport: document.getElementById('modal-export'),
+            btnExport: document.getElementById('btn-show-export'),
+            btnCloseExport: document.getElementById('btn-close-export'),
+            exportText: document.getElementById('export-text'),
+            exportPwd: document.getElementById('export-password'),
+            exportPwdGroup: document.getElementById('export-password-group'),
+            btnToggleExportPwd: document.getElementById('btn-toggle-export-pwd'),
+            iconPwdShow: document.getElementById('icon-pwd-show'),
+            iconPwdHide: document.getElementById('icon-pwd-hide'),
+            btnToggleEncrypt: document.getElementById('toggle-encrypt'),
+            toggleThumb: document.getElementById('toggle-thumb'),
+            btnCopyExport: document.getElementById('btn-copy-export'),
+            lblPlain: document.getElementById('lbl-plain'),
+            lblEncrypt: document.getElementById('lbl-encrypt'),
+
+            modalConfirm: document.getElementById('modal-confirm'),
+            confirmName: document.getElementById('confirm-name'),
+            btnConfirmCancel: document.getElementById('btn-confirm-cancel'),
+            btnConfirmDelete: document.getElementById('btn-confirm-delete'),
+        };
+
+        let itemToDelete = null;
+        let exportDebounceTimer = null;
+
+        /**
+         * INITIALIZATION & LOGIN
+         */
+        DOM.loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pwd = DOM.pwdInput.value;
+            
+            try {
+                if (pwd === "demo") {
+                    // Bootstrap demo data securely in-memory
+                    state.accounts = [
+                        { id: crypto.randomUUID(), name: "Google Demo", secret: "JBSWY3DPEHPK3PXP" },
+                        { id: crypto.randomUUID(), name: "GitHub Demo", secret: "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ" }
+                    ];
+                } else {
+                    const decryptedJson = await decryptData(ENCRYPTED_DATA_STORE, pwd);
+                    state.accounts = JSON.parse(decryptedJson);
+                }
+                
+                state.password = pwd;
+                DOM.loginError.classList.add('hidden');
+                DOM.login.classList.add('hidden');
+                DOM.main.classList.remove('hidden');
+                
+                renderAccounts();
+                startTimer();
+            } catch (err) {
+                console.error(err);
+                DOM.loginError.classList.remove('hidden');
+            }
+        });
+
+
+        /**
+         * RENDER ACCOUNTS
+         */
+        function renderAccounts() {
+            DOM.accountList.innerHTML = '';
+            
+            if (state.accounts.length === 0) {
+                DOM.accountList.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-40 text-slate-500">
+                        <svg class="w-12 h-12 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path></svg>
+                        <p>No accounts yet</p>
+                    </div>`;
+                return;
+            }
+
+            state.accounts.forEach(acc => {
+                const el = document.createElement('div');
+                el.className = 'bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center justify-between group transition-colors hover:border-slate-600';
+                
+                const isRevealed = state.revealedIds.has(acc.id);
+                const codeDisplay = isRevealed ? '<span class="animate-pulse">...</span>' : '••• •••';
+                
+                el.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-sm font-medium text-slate-300 truncate mb-1">${escapeHTML(acc.name)}</h3>
+                        <div id="code-${acc.id}" class="text-2xl font-mono tracking-[0.2em] text-indigo-400 font-bold h-8 flex items-center">
+                            ${codeDisplay}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                        <button class="btn-reveal p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors" data-id="${acc.id}" title="${isRevealed ? 'Hide' : 'Reveal'}">
+                            ${isRevealed 
+                                ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>` 
+                                : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>`
+                            }
+                        </button>
+                        <button class="btn-copy p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-700 rounded-lg transition-colors" data-id="${acc.id}" title="Copy">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                        </button>
+                        ${state.isEditMode ? `
+                        <button class="btn-delete p-2 text-slate-400 hover:text-red-400 hover:bg-slate-700 rounded-lg transition-colors" data-id="${acc.id}" title="Delete">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                        </button>` : ''}
+                    </div>
+                `;
+                
+                DOM.accountList.appendChild(el);
+
+                // Add event listeners locally to avoid global delegation issues
+                el.querySelector('.btn-reveal').addEventListener('click', () => toggleReveal(acc.id));
+                el.querySelector('.btn-copy').addEventListener('click', (e) => copyCode(acc.id, e.currentTarget));
+                
+                const deleteBtn = el.querySelector('.btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => confirmDelete(acc.id, acc.name));
+                }
+
+                // If already revealed (e.g. during re-render), inject code asynchronously
+                if (isRevealed) {
+                    generateTOTP(acc.secret).then(code => {
+                        const codeEl = document.getElementById(`code-${acc.id}`);
+                        if (codeEl) codeEl.innerText = `${code.slice(0,3)} ${code.slice(3)}`;
+                    });
+                }
+            });
+        }
+
+        async function toggleReveal(id) {
+            if (state.revealedIds.has(id)) {
+                state.revealedIds.delete(id);
+                renderAccounts();
+            } else {
+                state.revealedIds.add(id);
+                renderAccounts(); // sets to loading and changes icon
+            }
+        }
+
+        async function copyCode(id, btn) {
+            const acc = state.accounts.find(a => a.id === id);
+            if (!acc) return;
+            try {
+                const code = await generateTOTP(acc.secret);
+                
+                // Fallback approach for broader compatibility (including some iframes)
+                const textArea = document.createElement("textarea");
+                textArea.value = code;
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {
+                    await navigator.clipboard.writeText(code); // modern fallback
+                }
+                document.body.removeChild(textArea);
+
+                // Visual feedback
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                setTimeout(() => btn.innerHTML = originalHTML, 1500);
+            } catch (e) {
+                console.error("Copy failed", e);
+            }
+        }
+
+
+        /**
+         * TIMER & EPOCH LOGIC
+         */
+        function startTimer() {
+            setInterval(() => {
+                const now = Math.floor(Date.now() / 1000);
+                const block = Math.floor(now / 30);
+                const remaining = 30 - (now % 30);
+                
+                // Update circle
+                const circumference = 100.53; // 2 * pi * 16
+                const percent = remaining / 30;
+                DOM.epochProgress.style.strokeDashoffset = circumference - (percent * circumference);
+                
+                // Update text
+                DOM.epochTime.innerText = remaining;
+                DOM.epochTime.style.color = remaining <= 5 ? '#f87171' : 'inherit';
+                DOM.epochProgress.style.color = remaining <= 5 ? '#ef4444' : '#6366f1';
+
+                // Handle epoch shift
+                if (state.currentEpochBlock !== 0 && block !== state.currentEpochBlock) {
+                    if (state.revealedIds.size > 0) {
+                        state.revealedIds.clear();
+                        renderAccounts();
+                    }
+                }
+                state.currentEpochBlock = block;
+            }, 100); // 100ms for smooth animation
+        }
+
+
+        /**
+         * TOGGLE EDIT MODE
+         */
+        DOM.btnToggleEdit.addEventListener('click', () => {
+            state.isEditMode = !state.isEditMode;
+            if (state.isEditMode) {
+                DOM.btnToggleEdit.classList.add('text-red-400', 'bg-slate-800');
+                DOM.btnToggleEdit.classList.remove('text-slate-400');
+            } else {
+                DOM.btnToggleEdit.classList.remove('text-red-400', 'bg-slate-800');
+                DOM.btnToggleEdit.classList.add('text-slate-400');
+            }
+            renderAccounts();
+        });
+
+
+        /**
+         * ADD ACCOUNT LOGIC
+         */
+        DOM.btnAdd.addEventListener('click', () => {
+            DOM.addName.value = '';
+            DOM.addSecret.value = '';
+            DOM.addError.classList.add('hidden');
+            DOM.modalAdd.classList.remove('hidden');
+            DOM.addName.focus();
+        });
+
+        DOM.btnCancelAdd.addEventListener('click', () => {
+            DOM.modalAdd.classList.add('hidden');
+        });
+
+        DOM.btnSaveAdd.addEventListener('click', () => {
+            const name = DOM.addName.value.trim();
+            const secret = DOM.addSecret.value.replace(/\s+/g, '').toUpperCase();
+            
+            if (!name || !secret) {
+                DOM.addError.innerText = "Name and Secret are required.";
+                DOM.addError.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Test decode to validate base32
+                base32ToUint8Array(secret);
+            } catch (e) {
+                DOM.addError.innerText = "Invalid Base32 secret key.";
+                DOM.addError.classList.remove('hidden');
+                return;
+            }
+
+            state.accounts.push({
+                id: crypto.randomUUID(),
+                name: name,
+                secret: secret
+            });
+            
+            DOM.modalAdd.classList.add('hidden');
+            renderAccounts();
+        });
+
+
+        /**
+         * DELETE ACCOUNT LOGIC
+         */
+        function confirmDelete(id, name) {
+            itemToDelete = id;
+            DOM.confirmName.innerText = name;
+            DOM.modalConfirm.classList.remove('hidden');
+        }
+
+        DOM.btnConfirmCancel.addEventListener('click', () => {
+            itemToDelete = null;
+            DOM.modalConfirm.classList.add('hidden');
+        });
+
+        DOM.btnConfirmDelete.addEventListener('click', () => {
+            if (itemToDelete) {
+                state.accounts = state.accounts.filter(a => a.id !== itemToDelete);
+                state.revealedIds.delete(itemToDelete);
+                renderAccounts();
+            }
+            itemToDelete = null;
+            DOM.modalConfirm.classList.add('hidden');
+        });
+
+
+        /**
+         * EXPORT LOGIC
+         */
+        DOM.btnExport.addEventListener('click', () => {
+            DOM.exportPwd.value = state.password;
+            DOM.modalExport.classList.remove('hidden');
+            triggerExportUpdate();
+        });
+
+        DOM.btnCloseExport.addEventListener('click', () => {
+            DOM.modalExport.classList.add('hidden');
+        });
+
+        DOM.btnToggleExportPwd.addEventListener('click', () => {
+            if (DOM.exportPwd.type === 'password') {
+                DOM.exportPwd.type = 'text';
+                DOM.iconPwdShow.classList.add('hidden');
+                DOM.iconPwdHide.classList.remove('hidden');
+            } else {
+                DOM.exportPwd.type = 'password';
+                DOM.iconPwdHide.classList.add('hidden');
+                DOM.iconPwdShow.classList.remove('hidden');
+            }
+        });
+
+        DOM.btnToggleEncrypt.addEventListener('click', () => {
+            state.isExportEncrypted = !state.isExportEncrypted;
+            
+            if (state.isExportEncrypted) {
+                DOM.toggleThumb.style.transform = 'translateX(0)';
+                DOM.btnToggleEncrypt.classList.remove('bg-slate-600');
+                DOM.btnToggleEncrypt.classList.add('bg-indigo-600');
+                DOM.lblEncrypt.classList.add('text-indigo-400');
+                DOM.lblPlain.classList.remove('text-indigo-400');
+                DOM.exportPwdGroup.style.opacity = '1';
+                DOM.exportPwdGroup.style.pointerEvents = 'auto';
+            } else {
+                DOM.toggleThumb.style.transform = 'translateX(-16px)';
+                DOM.btnToggleEncrypt.classList.remove('bg-indigo-600');
+                DOM.btnToggleEncrypt.classList.add('bg-slate-600');
+                DOM.lblEncrypt.classList.remove('text-indigo-400');
+                DOM.lblPlain.classList.add('text-indigo-400');
+                DOM.exportPwdGroup.style.opacity = '0.3';
+                DOM.exportPwdGroup.style.pointerEvents = 'none';
+            }
+            triggerExportUpdate();
+        });
+
+        DOM.exportPwd.addEventListener('input', () => {
+            if (state.isExportEncrypted) {
+                triggerExportUpdate();
+            }
+        });
+
+        function triggerExportUpdate() {
+            clearTimeout(exportDebounceTimer);
+            DOM.exportText.value = 'Generating...';
+            exportDebounceTimer = setTimeout(async () => {
+                const jsonStr = JSON.stringify(state.accounts);
+                if (!state.isExportEncrypted) {
+                    DOM.exportText.value = JSON.stringify(state.accounts, null, 2);
+                } else {
+                    const pwd = DOM.exportPwd.value || state.password;
+                    try {
+                        const encryptedStr = await encryptData(jsonStr, pwd);
+                        DOM.exportText.value = encryptedStr;
+                    } catch (e) {
+                        DOM.exportText.value = 'Encryption failed. Check password constraints.';
+                    }
+                }
+            }, 300); // 300ms debounce
+        }
+
+        DOM.btnCopyExport.addEventListener('click', async () => {
+            const text = DOM.exportText.value;
+            const btn = DOM.btnCopyExport;
+            
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.select();
+                try { document.execCommand('copy'); } 
+                catch (err) { await navigator.clipboard.writeText(text); }
+                document.body.removeChild(textArea);
+
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copied!</span>`;
+                btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-700');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+                    btn.classList.replace('hover:bg-emerald-700', 'hover:bg-indigo-700');
+                }, 2000);
+            } catch (e) {
+                console.error("Copy failed", e);
+            }
+        });
+
+        /**
+         * UTILS
+         */
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+    </script>
+</body>
+</html>
